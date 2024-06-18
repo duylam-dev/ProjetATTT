@@ -9,7 +9,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.it4015.team13.domain.User;
 import com.it4015.team13.domain.request.ReqLoginDTO;
 import com.it4015.team13.domain.response.ResLoginDTO;
 import com.it4015.team13.util.SecurityUtil;
+import com.it4015.team13.util.exception.IdInValidException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,11 +30,29 @@ public class AuthenticationService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtEncoder jwtEncoder;
     private final UserService userService;
+    private final JwtDecoder jwtDecoder;
 
     @Value("${team13.jwt.access-token-validity-in-seconds}")
     private long accessToken_expired;
     @Value("${team13.jwt.refresh-token-validity-in-seconds}")
     private long refreshToken_expired;
+
+    public ResLoginDTO refreshToken(String refreshToken) throws IdInValidException {
+        var rs = new ResLoginDTO();
+        if (refreshToken.equals("error"))
+            throw new IdInValidException("cookie haven't refresh token");
+        Jwt token = jwtDecoder.decode(refreshToken);
+
+        String email = token.getSubject();
+        // check user
+        userService.handleFindByEmail(email);
+        // issue thong tin va generate access token
+        var userLogin = fetchInfoUserLogin(email);
+        rs.setUserLogin(userLogin);
+        String accessToken = generateToken(email, false, userLogin);
+        rs.setAccessToken(accessToken);
+        return rs;
+    }
 
     public ResLoginDTO authentication(ReqLoginDTO request) {
         var rs = new ResLoginDTO();
