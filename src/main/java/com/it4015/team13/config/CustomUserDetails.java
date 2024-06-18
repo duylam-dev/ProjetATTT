@@ -1,4 +1,4 @@
-package com.it4015.team13.util;
+package com.it4015.team13.config;
 
 import java.util.Collections;
 

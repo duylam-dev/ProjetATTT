@@ -10,13 +10,13 @@ import com.it4015.team13.domain.response.RestResponse;
 @RestControllerAdvice
 public class GlobalException {
 
-    @ExceptionHandler(value = { IdValidException.class })
-    public ResponseEntity<RestResponse<Object>> handleIdValidException(IdValidException ex) {
+    @ExceptionHandler(value = { IdInValidException.class })
+    public ResponseEntity<RestResponse<Object>> handleIdValidException(IdInValidException ex) {
         var rs = new RestResponse<>();
         rs.setStatusCode(HttpStatus.BAD_REQUEST.value());
         rs.setError(ex.getMessage());
         rs.setMessage("Call api error");
-        return ResponseEntity.ok(rs);
+        return ResponseEntity.badRequest().body(rs);
     }
 
 }

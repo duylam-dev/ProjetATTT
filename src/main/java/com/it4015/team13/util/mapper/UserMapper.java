@@ -1,19 +1,30 @@
 package com.it4015.team13.util.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-
 import com.it4015.team13.domain.User;
-import com.it4015.team13.domain.response.User.ResCreateUserDTO;
-import com.it4015.team13.domain.response.User.ResUpdateUserDTO;
-import com.it4015.team13.domain.response.User.ResUserDTO;
+import com.it4015.team13.domain.response.ResCreateUserDTO;
+import com.it4015.team13.domain.response.ResUserDTO;
 
-@Mapper(componentModel = "spring")
-public interface UserMapper {
-    ResCreateUserDTO toResCreateDTO(User user);
+public class UserMapper {
+    public static ResCreateUserDTO toCreateUserDTO(User user) {
+        var ans = new ResCreateUserDTO();
+        ans.setId(user.getId());
+        ans.setName(user.getName());
+        ans.setEmail(user.getEmail());
+        ans.setCreatedBy(user.getCreatedBy());
+        ans.setCreatedAt(user.getCreatedAt());
+        return ans;
+    }
 
-    ResUserDTO toResUserDTO(User user);
+    public static ResUserDTO toResUserDTO(User user) {
+        var ans = new ResUserDTO();
+        ans.setId(user.getId());
+        ans.setName(user.getName());
+        ans.setEmail(user.getEmail());
+        ans.setCreatedBy(user.getCreatedBy());
+        ans.setCreatedAt(user.getCreatedAt());
+        ans.setUpdateAt(user.getUpdatedAt());
+        ans.setUpdateBy(user.getUpdatedBy());
+        return ans;
 
-    void updateUser(@MappingTarget ResUpdateUserDTO updateUserDTO, User user);
-
+    }
 }
