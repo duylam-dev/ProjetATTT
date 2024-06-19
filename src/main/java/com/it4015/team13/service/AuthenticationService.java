@@ -40,7 +40,8 @@ public class AuthenticationService {
     public ResLoginDTO refreshToken(String refreshToken) throws IdInValidException {
         var rs = new ResLoginDTO();
         if (refreshToken.equals("error"))
-            throw new IdInValidException("cookie haven't refresh token");
+            // throw new IdInValidException("cookie haven't refresh token");
+            return null;
         Jwt token = jwtDecoder.decode(refreshToken);
 
         String email = token.getSubject();
