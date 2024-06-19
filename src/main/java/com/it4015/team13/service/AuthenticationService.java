@@ -75,6 +75,13 @@ public class AuthenticationService {
         return rs;
     }
 
+    public void logout() throws IdInValidException {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        if (email.equals(""))
+            throw new IdInValidException("access token khong hop le");
+        userService.handleUpdateRefreshToken(email, null);
+    }
+
     private String generateToken(String email, boolean isRefresh, ResLoginDTO.UserLogin user) {
 
         Instant now = Instant.now();

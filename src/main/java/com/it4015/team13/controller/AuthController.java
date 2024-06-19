@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class AuthController extends BaseController {
                 var res = authenticationService.authentication(request);
 
                 ResponseCookie cookie = ResponseCookie
-                                .from("refresh_token", userService.handleFindByEmail(
+                                .from("refreshToken", userService.handleFindByEmail(
                                                 res.getUserLogin().getEmail()).getRefreshToken())
                                 .httpOnly(true)
                                 .secure(true)
@@ -47,12 +48,29 @@ public class AuthController extends BaseController {
 
         @PostMapping("/auth/refresh")
         public ResponseEntity<ResLoginDTO> refresh(
-                        @CookieValue(name = "refresh_token", defaultValue = "error") String token)
+                        @CookieValue(name = "refreshToken", defaultValue = "error") String token)
                         throws IdInValidException {
 
                 var res = authenticationService.refreshToken(token);
 
                 return ResponseEntity.ok(res);
+        }
+
+        @DeleteMapping("/auth/logout")
+        public ResponseEntity<Void> logout() throws IdInValidException {
+                authenticationService.logout();
+
+                ResponseCookie cookie = ResponseCookie
+                                .from("refreshToken", "")
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/")
+                                .maxAge(0)
+                                .build();
+
+                return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(null);
         }
 
 }
