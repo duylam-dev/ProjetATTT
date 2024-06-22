@@ -40,8 +40,8 @@ public class AuthenticationService {
     public ResLoginDTO refreshToken(String refreshToken) throws IdInValidException {
         var rs = new ResLoginDTO();
         if (refreshToken.equals("error"))
-            // throw new IdInValidException("cookie haven't refresh token");
-            return null;
+            throw new IdInValidException("cookie haven't refresh token");
+
         Jwt token = jwtDecoder.decode(refreshToken);
 
         String email = token.getSubject();
@@ -81,6 +81,13 @@ public class AuthenticationService {
         if (email.equals(""))
             throw new IdInValidException("access token khong hop le");
         userService.handleUpdateRefreshToken(email, null);
+    }
+
+    public ResLoginDTO.UserLogin getAccount() throws IdInValidException {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        if (email.equals(""))
+            throw new IdInValidException("access token khong hop le");
+        return fetchInfoUserLogin(email);
     }
 
     private String generateToken(String email, boolean isRefresh, ResLoginDTO.UserLogin user) {
