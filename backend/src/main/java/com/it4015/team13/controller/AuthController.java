@@ -6,6 +6,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class AuthController extends BaseController {
                 var res = authenticationService.authentication(request);
 
                 ResponseCookie cookie = ResponseCookie
-                                .from("refreshToken", userService.handleFindByEmail(
+                                .from("refresh_token", userService.handleFindByEmail(
                                                 res.getUserLogin().getEmail()).getRefreshToken())
                                 .httpOnly(true)
                                 .secure(true)
@@ -48,7 +49,7 @@ public class AuthController extends BaseController {
 
         @PostMapping("/auth/refresh")
         public ResponseEntity<ResLoginDTO> refresh(
-                        @CookieValue(name = "refreshToken", defaultValue = "error") String token)
+                        @CookieValue(name = "refresh_token", defaultValue = "error") String token)
                         throws IdInValidException {
 
                 var res = authenticationService.refreshToken(token);
@@ -61,7 +62,7 @@ public class AuthController extends BaseController {
                 authenticationService.logout();
 
                 ResponseCookie cookie = ResponseCookie
-                                .from("refreshToken", "")
+                                .from("refresh_token", "")
                                 .httpOnly(true)
                                 .secure(true)
                                 .path("/")
@@ -71,6 +72,11 @@ public class AuthController extends BaseController {
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                                 .body(null);
+        }
+
+        @GetMapping("/auth/getAccount")
+        public ResponseEntity<ResLoginDTO.UserLogin> getAccount() throws IdInValidException {
+                return ResponseEntity.ok(authenticationService.getAccount());
         }
 
 }
